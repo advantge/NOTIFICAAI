@@ -1,0 +1,15 @@
+{
+  "id": "ORDE_EXEMPLO_SANITIZADO",
+  "reference_id": "VEN-EXEMPLO-001",
+  "charges": [
+    {
+      "id": "CHAR_EXEMPLO_SANITIZADO",
+      "status": "PAID",
+      "paid_at": "2026-07-27T14:32:00-03:00",
+      "amount": {
+        "value": 450017,
+        "currency": "BRL"
+      }
+    }
+  ]
+}

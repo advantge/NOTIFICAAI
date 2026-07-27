@@ -1,0 +1,10 @@
+{
+  "name": "Notifica AI",
+  "short_name": "Notifica",
+  "description": "Cobranças Pix individuais e confirmação em tempo real.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f6f7",
+  "theme_color": "#111315",
+  "lang": "pt-BR"
+}

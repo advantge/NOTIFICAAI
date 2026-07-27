@@ -1,0 +1,22 @@
+### Webhook PagBank sanitizado
+POST http://localhost:3000/api/webhooks/pagbank
+Content-Type: application/json
+
+< ../examples/pagbank-webhook.sanitized.json
+
+### MCP initialize
+POST http://localhost:3000/api/mcp
+Authorization: Bearer {{$dotenv MCP_AUTH_TOKEN}}
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "initialize",
+  "params": {
+    "protocolVersion": "2025-11-25",
+    "capabilities": {},
+    "clientInfo": { "name": "notifica-ai-test", "version": "1.0.0" }
+  }
+}
