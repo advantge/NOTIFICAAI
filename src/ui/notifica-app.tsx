@@ -200,7 +200,7 @@ export function NotificaApp() {
         </a>
         <div className="connection-state">
           <span className="connection-dot" />
-          Pronto para PagBank
+          Provedor não conectado
         </div>
       </header>
 
@@ -398,7 +398,7 @@ export function NotificaApp() {
             <Wifi size={20} />
             <span>
               <strong>PagBank</strong>
-              <small>Credenciais vazias · pronto para conectar</small>
+              <small>Configure as credenciais no Vercel para ativar</small>
             </span>
           </div>
           <div>
