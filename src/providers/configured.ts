@@ -5,15 +5,17 @@ import { PagBankPaymentProvider, type PagBankConfig } from "./pagbank/provider";
 type RuntimeEnv = Record<string, string | undefined>;
 
 export type PaymentRuntimeConfig = {
-  mode: "mock" | "pagbank";
+  mode: "mock" | "pagbank" | "unconfigured";
   connected: boolean;
   environment: "demo" | "sandbox" | "production";
   pagBank: PagBankConfig;
 };
 
 export function paymentRuntimeConfig(env: RuntimeEnv): PaymentRuntimeConfig {
+  const production =
+    env.VERCEL_ENV === "production" || env.APP_ENV === "production";
   const environment =
-    env.PAGBANK_ENV === "production" ? "production" : "sandbox";
+    production || env.PAGBANK_ENV === "production" ? "production" : "sandbox";
   const enabled =
     env.PAYMENT_PROVIDER === "pagbank" &&
     env.PAGBANK_ENABLED === "true" &&
@@ -34,9 +36,9 @@ export function paymentRuntimeConfig(env: RuntimeEnv): PaymentRuntimeConfig {
   };
 
   return {
-    mode: enabled ? "pagbank" : "mock",
+    mode: enabled ? "pagbank" : production ? "unconfigured" : "mock",
     connected: enabled,
-    environment: enabled ? environment : "demo",
+    environment: enabled ? environment : production ? "production" : "demo",
     pagBank,
   };
 }
