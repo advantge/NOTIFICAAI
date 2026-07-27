@@ -10,7 +10,10 @@ MCP_ROLE=ADMIN
 
 Envie `Authorization: Bearer <token>`.
 
-Ferramentas: `create_pix_sale`, `get_sale`, `get_sale_payment_status`,
+Para criar uma cobrança, `create_pix_sale` recebe somente `amount`, em
+centavos. Não é necessário informar cliente, vendedor, aparelho ou descrição.
+
+Ferramentas disponíveis: `create_pix_sale`, `get_sale`, `get_sale_payment_status`,
 `list_pending_sales`, `list_paid_sales`, `list_ambiguous_payments`,
 `get_payment_details`, `retry_payment_verification`,
 `manually_reconcile_payment`, `list_sellers`, `get_seller_performance`,

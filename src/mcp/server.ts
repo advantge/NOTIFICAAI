@@ -12,12 +12,10 @@ const toolDefinitions: Array<{
 }> = [
   {
     name: "create_pix_sale",
-    description: "Cria uma venda Pix usando os serviços internos autorizados.",
+    description:
+      "Cria uma cobrança Pix informando somente o valor em centavos.",
     inputSchema: {
-      customerName: z.string().min(2),
-      description: z.string().min(2),
       amount: z.number().int().positive(),
-      sellerId: z.string().optional(),
     },
   },
   {

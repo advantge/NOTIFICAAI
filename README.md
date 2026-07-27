@@ -1,34 +1,66 @@
 # Notifica AI
 
-Aplicação web para registrar vendas, gerar cobranças Pix individuais na mesma
-conta PagBank e avisar automaticamente o vendedor correto após verificação
-financeira.
+Aplicação enxuta para registrar uma venda pelo valor, gerar a cobrança Pix,
+enviar o QR Code ao cliente, validar o pagamento e exibir a notificação.
 
-## O que funciona
+## Fluxo
 
-- dashboard administrativo e dashboard de vendedor;
-- nova venda, QR Code, Pix Copia e Cola, cópia e compartilhamento;
-- simulação de pagamento e confirmação visual;
-- vendas, pagamentos, notificações, conciliação, relatórios e saúde;
-- provider mock completo e adapter PagBank pela API Order oficial;
-- webhook com limite, validação, sanitização, hash e deduplicação;
-- máquinas de estado, RBAC e verificação de valor/moeda/IDs;
-- schema Drizzle com 15 tabelas e migration;
-- MCP Streamable HTTP autenticado e autorizado;
-- layout responsivo de 320 px a telas amplas.
+1. Informe somente o valor da venda.
+2. Clique em **Gerar Pix**.
+3. Copie, compartilhe ou envie o QR Code ao cliente.
+4. O webhook do PagBank sinaliza a mudança.
+5. O sistema consulta o pedido diretamente no PagBank.
+6. Somente depois da validação a venda muda para paga e a notificação aparece.
 
-## Início rápido
+O sistema inicia com vendas, recebimentos, valores pendentes e notificações em
+zero. Não existem clientes, aparelhos, vendedores ou transações fictícias.
 
-Requisitos: Node.js 22.13 ou superior.
+## Executar
+
+Requisito: Node.js 22.13 ou superior.
 
 ```bash
-cp .env.example .env.local
 pnpm install
 pnpm dev
 ```
 
-Acesse `http://localhost:3000`. O modo padrão é `PAYMENT_PROVIDER=mock` e mostra
-claramente o selo “Ambiente de demonstração”.
+Sem credenciais, o sistema usa o provider local de validação. Nenhuma
+credencial real é incluída no repositório.
+
+## Conectar ao PagBank
+
+Cadastre estas variáveis no ambiente de hospedagem:
+
+```text
+PAYMENT_PROVIDER=pagbank
+PAGBANK_ENABLED=true
+PAGBANK_ENV=sandbox
+PAGBANK_API_BASE_URL=https://sandbox.api.pagseguro.com
+PAGBANK_ACCESS_TOKEN=
+PAGBANK_WEBHOOK_URL=https://SEU_DOMINIO/api/webhooks/pagbank
+PAGBANK_ACCOUNT_ID=
+```
+
+Depois da homologação, altere o ambiente e a URL da API para produção.
+Consulte [a documentação da integração](docs/pagbank/README.md).
+
+## MCP
+
+O endpoint está em `/api/mcp`. Para ativá-lo:
+
+```text
+MCP_ENABLED=true
+MCP_AUTH_TOKEN=
+MCP_ROLE=ADMIN
+```
+
+A ferramenta `create_pix_sale` recebe somente `amount`, em centavos. Consulte
+[a documentação MCP](docs/mcp/README.md).
+
+## Vercel
+
+O repositório contém `vercel.json` e o script `pnpm vercel-build`. Importe o
+repositório com o preset Next.js e configure as variáveis no painel da Vercel.
 
 ## Verificações
 
@@ -37,48 +69,13 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm format:check
-pnpm build
+pnpm vercel-build
 ```
-
-## Banco
-
-O deploy Sites usa Cloudflare D1 com Drizzle. A migration fica em `drizzle/`.
-O domínio não depende do driver; um adapter PostgreSQL pode ser usado em
-implantação própria sem alterar serviços ou providers.
-
-## Vercel
-
-O repositório inclui `vercel.json` e o script `pnpm vercel-build`, que executa
-o build Next.js nativo usado pela Vercel. Importe o repositório no painel da
-Vercel com o preset Next.js e mantenha o diretório raiz do projeto.
-
-O painel e o provider mock funcionam sem variáveis obrigatórias. Para ativar o
-PagBank real e o MCP, cadastre na Vercel as variáveis descritas em
-`.env.example`. Nunca envie credenciais para o Git.
-
-Cloudflare D1 não está disponível na Vercel. Antes de habilitar persistência em
-produção na Vercel, conecte um banco PostgreSQL e implemente o adapter descrito
-na documentação de arquitetura.
-
-## PagBank
-
-O adapter real permanece desabilitado até o preenchimento das credenciais e
-homologação. Consulte [docs/pagbank/README.md](docs/pagbank/README.md).
-
-O webhook nunca confirma o pagamento. Ele dispara uma consulta autenticada ao
-PagBank; somente a resposta consultada pode avançar a venda para paga.
-
-## MCP
-
-Defina `MCP_ENABLED=true`, gere `MCP_AUTH_TOKEN` forte e acesse `/api/mcp`.
-Consulte [docs/mcp/README.md](docs/mcp/README.md).
 
 ## Documentação
 
 - [Arquitetura](docs/architecture/README.md)
-- [Integração PagBank](docs/pagbank/README.md)
+- [PagBank](docs/pagbank/README.md)
 - [MCP](docs/mcp/README.md)
 - [Segurança](docs/security/README.md)
-- [Runbook de incidentes](docs/runbooks/payment-incident.md)
-- [Especificação](docs/superpowers/specs/2026-07-27-notifica-ai-core-design.md)
-- [Plano](docs/superpowers/plans/2026-07-27-notifica-ai-implementation.md)
+- [Incidentes de pagamento](docs/runbooks/payment-incident.md)

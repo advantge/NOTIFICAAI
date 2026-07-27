@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     template: "%s · Notifica AI",
   },
   description:
-    "Gestão inteligente de vendas Pix com confirmação segura e alertas em tempo real.",
+    "Registre o valor, gere o Pix e receba a confirmação do pagamento.",
   openGraph: {
     type: "website",
     locale: "pt_BR",

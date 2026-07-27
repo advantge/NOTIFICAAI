@@ -1,4 +1,5 @@
 import { demoSales, sellers, type DemoSale } from "../demo/data";
+import { configuredPaymentProvider } from "../providers/configured";
 import type { McpToolName } from "./authorization";
 
 const createdSales: DemoSale[] = [];
@@ -14,21 +15,26 @@ export async function executeMcpTool(
   switch (name) {
     case "create_pix_sale": {
       const amount = Number(input.amount);
-      const reference = `MCP-${Date.now()}`;
+      const reference = `mcp-${crypto.randomUUID()}`;
+      const { provider } = configuredPaymentProvider();
+      const charge = await provider.createPixCharge({
+        referenceId: reference,
+        amount: { currency: "BRL", value: amount },
+        customerName: "Cliente",
+        expiresAt: new Date(Date.now() + 86_400_000),
+      });
       const sale: DemoSale = {
         id: crypto.randomUUID(),
         reference,
-        customer: String(input.customerName),
-        description: String(input.description),
+        customer: "Cliente",
+        description: "Venda rápida",
         amount,
-        seller: "Agente autorizado",
-        sellerId: String(input.sellerId ?? "mcp-service"),
+        seller: "Operação",
+        sellerId: "mcp-service",
         status: "AWAITING_PAYMENT",
         createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 86_400_000).toISOString(),
-        pixCode: `00020101021226830014BR.GOV.BCB.PIX52040000530398654${(
-          amount / 100
-        ).toFixed(2)}5802BR5911NOTIFICA AI6009FORTALEZA62070503***6304DEMO`,
+        expiresAt: charge.expiresAt.toISOString(),
+        pixCode: charge.pixCopyPaste,
       };
       createdSales.unshift(sale);
       return sale;
@@ -74,12 +80,14 @@ export async function executeMcpTool(
           .reduce((sum, sale) => sum + sale.amount, 0),
         currency: "BRL",
       };
-    case "get_integration_health":
+    case "get_integration_health": {
+      const { provider, config } = configuredPaymentProvider();
+      const health = await provider.healthCheck();
       return {
-        provider: "mock",
-        healthy: true,
-        environment: "demo",
-        pagBank: "NOT_CONFIGURED",
+        provider: config.mode,
+        connected: config.connected,
+        ...health,
       };
+    }
   }
 }
