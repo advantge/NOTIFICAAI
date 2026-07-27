@@ -20,6 +20,16 @@ export async function POST(request: Request) {
   try {
     const referenceId = `sale-${crypto.randomUUID()}`;
     const { provider, config } = configuredPaymentProvider();
+    if (config.mode === "unconfigured") {
+      return NextResponse.json(
+        {
+          error:
+            "O provedor de pagamentos ainda não está configurado nesta implantação.",
+          code: "PAYMENT_PROVIDER_NOT_CONFIGURED",
+        },
+        { status: 503 },
+      );
+    }
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const charge = await provider.createPixCharge({
       referenceId,
