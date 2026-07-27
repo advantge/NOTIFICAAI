@@ -32,4 +32,17 @@ describe("payment runtime configuration", () => {
       environment: "sandbox",
     });
   });
+
+  it("blocks the mock provider in Vercel production when no real provider is configured", () => {
+    expect(
+      paymentRuntimeConfig({
+        VERCEL_ENV: "production",
+        PAYMENT_PROVIDER: "mock",
+      }),
+    ).toMatchObject({
+      mode: "unconfigured",
+      connected: false,
+      environment: "production",
+    });
+  });
 });
